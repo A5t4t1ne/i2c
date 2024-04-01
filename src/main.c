@@ -69,10 +69,9 @@ int main() {
     /* startup sequence */
     char inp;
     while (pwList.file == NULL && running) {
-        /* Clear input until whitespace */
-        printf("Enter 'o' for opening a database, 'c' for creating one or 'q' to quit:\n> ");
-        inp = getchar();
-        fflush(stdin); // clear input buffer
+        printf("Enter 'o' for opening a database, 'c' for creating one or 'q' to quit:\n");
+        
+        get_n_chars(&inp, 1, "> ");
 
         switch (inp)
         {
@@ -130,9 +129,7 @@ int main() {
    /* main sequence */
     printf("Enter a command. 'h' for help\n");
     while (running) {
-        printf("> ");
-        inp = getchar();
-        fflush(stdin); // clear input buffer
+        get_n_chars(&inp, 1, "> ");
         switch (inp) {
             case 'e': {
                 unsigned char key[MAX_KEY_LEN] = {0};
@@ -149,9 +146,9 @@ int main() {
                 /*  Generate password or let user set manually */
                 bool inp_valid = false;
                 while(!inp_valid){
-                    printf("Choose one of the following:\n1 - set password manually\n2 - generate password\n> ");
-                    inp = getchar();
-                    fflush(stdin); // clear input buffer
+                    printf("Choose one of the following:\n1 - set password manually\n2 - generate password\n");
+                    
+                    get_n_chars(&inp, 1, "> ");
 
                     if (inp < '1' || inp > '2'){
                         printf("[*] not a valid option\n");
@@ -165,8 +162,8 @@ int main() {
                             inp_valid = true;
                             break;
                         case '2':{
-                            printf("Choose the charset complexity:\n1 - weak\n2 - medium\n3 - strong\n> ");
-                            inp = getchar();
+                            printf("Choose the charset complexity:\n1 - weak\n2 - medium\n3 - strong\n");
+                            get_n_chars(&inp, 1, "> ");
                             fflush(stdin); // clear input buffer
                             
                             if (inp < '1' || inp > '3'){
@@ -362,15 +359,15 @@ static bool unlock_database(pw_list_t *pwList){
 */
 static void get_n_chars(char* dest, size_t n, char* prompt){
     char buf[n+2]; // +2 for newline and null terminator
-    
     while (true)
     {
         memset(buf, 0, sizeof(buf));
         printf("%s", prompt);
+        fflush(stdin);
         fgets(buf, sizeof(buf), stdin);
 
         int c;
-        if (buf[sizeof(buf)-2] != 0){
+        if (buf[sizeof(buf)-2] != '\n' && buf[sizeof(buf)-2] != '\0'){
             printf("\033[31m"); // set text color to red
             printf("[!] Input too long\n");
             printf("\033[0m"); // reset text color to default
