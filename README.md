@@ -26,8 +26,6 @@ The (plaintext) entries are newline-terminated strings chained one after another
 
 ## TODO
 
--   Password generation
--   Password copying to clipboard
 -   maybe hash table implementation
 
 ## External Dependencies
@@ -39,34 +37,63 @@ The (plaintext) entries are newline-terminated strings chained one after another
 
 #### Linux
 
-Install libsodium with your package manager, on Debian-systems:
+Install libsodium with your package manager. 
 
+Debian-systems:
 ```bash
 sudo apt-get install libsodium-dev
 ```
 
-And the src/CMakeLists.txt should look like this:
+Arch:
+```bash
+sudo pacman -S libsodium
+```
+
+And the src/CMakeLists.txt should look somewhat like this:
 
 ```cmake
+cmake_minimum_required(VERSION 3.0.0)
+project(pw_manager VERSION 0.1.0)
+
 # libsodium
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBSODIUM REQUIRED libsodium)
 include_directories(${LIBSODIUM_INCLUDE_DIRS})
 
-add_executable(pw_manager main.c crypto.c files.c password.c)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_executable(pw_manager
+  ${SOURCE_DIR}/main.c
+  ${SOURCE_DIR}/crypto.c
+  ${SOURCE_DIR}/files.c
+  ${SOURCE_DIR}/password.c
+)
 target_include_directories(pw_manager PUBLIC include)
 
-# use static openssl library
-set(OPENSSL_USE_STATIC_LIBS TRUE)
+# Find OpenSSL
 find_package(OpenSSL REQUIRED)
 if(OPENSSL_FOUND)
-message("OPENSSL FOUND!")
+    message("OpenSSL found")
+    include_directories(${OPENSSL_INCLUDE_DIR})
+
+    find_library(LIBSODIUM_LIBRARY NAMES sodium REQUIRED)
+    if(NOT LIBSODIUM_LIBRARY)
+        message(FATAL_ERROR "libsodium not found")
+    endif()
+    target_link_libraries(pw_manager
+        ${OPENSSL_LIBRARIES}
+        ${LIBSODIUM_LIBRARY}
+        ${CMAKE_DL_LIBS}
+    )
+
+else()
+  message(FATAL_ERROR "OpenSSL not found")
 endif()
-target_link_libraries(pw_manager OpenSSL::Crypto ${LIBSODIUM_DIR}/lib/libsodium.a ${CMAKE_DL_LIBS})
 
 message(STATUS "OpenSSL include dir: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "OpenSSL found: ${OPENSSL_FOUND}")
 message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
+
+
 ```
 
 #### Windows
