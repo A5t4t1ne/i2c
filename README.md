@@ -28,9 +28,9 @@ The (plaintext) entries are newline-terminated strings chained one after another
 
 (These are hypothetical improvements with no guarantee of implementation in the foreseeable future).
 
-- [ ] sort entries for binary search
-- OR
-- [ ] hash table implementation for entries
+- [ ] sort entries for binary search \
+OR
+- [ ] hash table implementation for keys/entries
 - [ ] support for UTF-8
 
 ## External Dependencies
