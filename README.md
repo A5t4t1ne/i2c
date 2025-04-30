@@ -15,18 +15,23 @@ The filestructure is as follows:
 | encrypted n-bytes | key2:val2\n           |
 | ...               | ...\0                 |
 
-Whereas the hash is the master-password hash and the salt is used to encrypt/decrypt the entries with AES256.
+Whereas the hash is the master-password hash. The plaintext master-password is used to encrypt/decrypt the entries with AES256.
 The (plaintext) entries are newline-terminated strings chained one after another.
 
 ## Limitations
 
--   The application can only understand and process extended ASCII (8bit) characters.
+-   The application can only understand and process ASCII characters.
 -   Since the individual entries are arranged directly next to each other, a compromise
-    must be made between write speed and file size when handling insertions.
+    was made between write speed and file size when handling insertions.
 
 ## TODO
 
--   maybe hash table implementation
+(These are hypothetical improvements with no guarantee of implementation in the foreseeable future).
+
+- [ ] sort entries for binary search
+- OR
+- [ ] hash table implementation for entries
+- [ ] support for UTF-8
 
 ## External Dependencies
 
@@ -37,17 +42,19 @@ The (plaintext) entries are newline-terminated strings chained one after another
 
 #### Linux
 
-Install libsodium with your package manager. 
+Install libsodium with your package manager.
+
+Arch:
+```bash
+sudo pacman -S libsodium
+```
 
 Debian-systems:
 ```bash
 sudo apt-get install libsodium-dev
 ```
 
-Arch:
-```bash
-sudo pacman -S libsodium
-```
+
 
 And the src/CMakeLists.txt should look somewhat like this:
 
